@@ -1,0 +1,1 @@
+Open game.html in your browser
