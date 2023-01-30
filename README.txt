@@ -1,1 +1,1 @@
-Open game.html in your browser
+Download the project, unzip it, and open index.html in your browser
