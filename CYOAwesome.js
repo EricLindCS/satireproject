@@ -1,11 +1,3 @@
-/*
-CYOAwesome by @EricLindCS
-*/
-
-// for no globals, uncomment next line and last line of file
-// then edit the html to refer to game.functions()
-
-// var game = new CYOAwesome(); function CYOAwesome() {
 
 "use strict"; // ensure clean clode
 
