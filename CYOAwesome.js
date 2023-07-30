@@ -70,9 +70,6 @@ var the_scene_so_far = ""; // html ripped every frame TODO: optimize
 
 function init(story_txt)
 {
-	if (debugmode) console.log("------------------------------------------------");
-	if (debugmode) console.log("CYOAwesome v0.6 by Christer McFunkypants Kaitila");
-	if (debugmode) console.log("------------------------------------------------");
 
 	init_browser();
 
@@ -190,18 +187,7 @@ function init_browser()
 
 	// Enable the tab character when editing
 	enableTab('game_source');
-	
-	// block the BACK BUTTON
-	// FIXME this is UX hack but people keep
-	// pressing the back button or reload by accident
-	/*
-	window.onbeforeunload = function(e) 
-	{
-		var dialogText = 'Quit game?';
-		e.returnValue = dialogText;
-		return dialogText;
-	};
-	*/
+
 }
 
 function trimStr(str) {
@@ -221,48 +207,10 @@ function preg_quote( str ) {
 	return (str+'').replace(/([\\\.\+\*\?\[\^\]\$\(\)\{\}\=\!\<\>\|\:])/g, "\\$1");
 }
 
-// words that could get fun css styles
-var onomatopoeia = ['argh','achoo','ahem','bang','bash','bam','bark','bawl','beep',
-'belch','blab','blare','blurt','boing','boink','bonk','bong','boo','boo-hoo','boom',
-'bow-wow','brring','bubble','bump','burp','buzz','cackle','chatter','cheep','chirp',
-'chomp','choo-choo','chortle','clang','clash','clank','clap','clack','clatter','click',
-'clink','clip clop','cluck','clunk','cock a doodle doo','cough','crack','crackle',
-'crash','creak','croak','crunch','cuckoo','ding','ding dong','drip','fizz','flick',
-'flip','flip-flop','flop','flutter','giggle','glug','glup','groan','growl','grunt',
-'guffaw','gurgle','hack','haha','hack','hiccup','hiss','hohoho','honk','hoot','howl',
-'huh','hum','jangle','jingle','ker-ching','kerplunk','knock','la','meow','moan','moo',
-'mumble','munch','murmur','mutter','neigh','oink','ouch','ooze','phew','ping',
-'ping pong','pitter patter','plink','plop','pluck','plunk','poof','pong','pop','pow',
-'purr','quack','rattle','ribbit','ring','rip','roar','rumble','rush','rustle','screech',
-'shuffle','shush','sizzle','slap','slash','slish','slither','slosh','slurp','smack',
-'snap','snarl','sniff','snip','snore','snort','spit','splash','splat','splatter','splish',
-'splosh','squawk','squeak','squelch','squish','sway','swish','swoosh','thud','thump',
-'thwack','tic-toc','tinkle','trickle','twang','tweet','ugh','vroom','waffle','whack',
-'whallop','wham','whimper','whip','whirr','whish','whisper','whizz','whoop','whoosh',
-'woof','yelp','yikes','zap','zing','zip','zoom','hot','heat','burn','burning','blazing',
-'fire','cold','frozen','freeze','ice','chilly','frosty','frost','iced','molten','melt',
-'melted','melting','bashed','bash','smashed','smash','broke',
-'shattered','beat','punched','hit','slapped','shot','fired','shook','shake','jump',
-'tilt','wave','shudder','shake','vibrate','wiggle','wobble','loose','broken','glithy',
-'unsteady','drunk','wobbly','shaky','bounced','bounce','rolled','roll','break','broken',
-'destroyed','exploded','destruction','death','strong','stronger','weak',
-'weaker','angry','sad','mad','hurt','scared','frightened','tired'];
-var onomatopoeia_regex = new RegExp('(\\b)(' + onomatopoeia.join('|') + ')(\\b)', 'ig'); // word boundaries	// (^|\s) and ($|\s) for entire words
-
 function coolify(str)
 {
 	return str.replace(onomatopoeia_regex, "$1<b class='$2'>$2</b>$3"); // classname gets found
 }
-
-// wrap case insensitively matching words in <b> tags
-/*
-function boldify(haystack, needle) // 
-{
-	var prefix = "<b>";// class='$1'>";
-	var suffix = "</b>";
-	return (haystack+'').replace( new RegExp( "(" + preg_quote( needle ) + ")" , 'gi' ), prefix + "$1" + suffix );
-}
-*/
 
 function megalinkify(text) // look for all scenes and add links
 {
@@ -1007,36 +955,6 @@ function render(html,instant,cls)
 		}
 	}
 	
-
-	// we could detect dead ends, but in CYOA isbutton mode or !LINKIFY_STORY_TEXT the scene html may have no links
-	/*
-	if (!scene_has_links && !currentscene_div.innerHTML.includes("<a")) // FIXME: wonky: x2 adds links to links!
-	{
-		if (debugmode) console.log("STORY ERROR: DEAD END DETECTED!");
-
-		// "works" but 2 problems: this could cause wierd loopable sections, and CLS can make nothing to link
-		currentscene_div.innerHTML = megalinkify(currentscene_div.innerHTML);
-		if (!story_so_far_div.innerHTML.includes("<a")) story_so_far_div.innerHTML = megalinkify(story_so_far_div.innerHTML);
-		html = megalinkify(html);
-		deadend = true;
-
-		// still no links? manually add links the previous "CLS" scene
-		// fixme what if this is the first scene?
-		if (currentscene == last_cls_scene)
-			html += "<p><a onclick=\"go('" + second_last_cls_scene + "',this)\">Continue...</a></p>"
-		else
-			html += "<p><a onclick=\"go('" + last_cls_scene + "',this)\">Continue...</a></p>"
-
-		// idea: automatically link nearby scenes... buggy
-		//html += "<p>Nearby locations: ";
-		//html += linkify(last_item(visited_scenes)) + ", ";
-		//html += linkify(last_item(visited_scenes,1)) + ", ";
-		//html += linkify(last_item(visited_scenes,2)) + ", ";
-		//html += linkify(last_item(visited_scenes,3)) + ".";
-		//html += "</p>";
-
-	}
-	*/
 	update_hud();
 
 	if (instant) 
@@ -1068,16 +986,6 @@ function autoscroll()
 {
 	gamediv.scrollTop = gamediv.scrollHeight - gamediv.clientHeight;
 }
-
-/*
-function splitTags(str) // wonky - breaks on nested tags etc
-{
-	var htmlTagRegex =/\s*(<[^>]*>)/g     
-	//str = '<div class="tab0">CSS code formatter</div><div class="tab2">CSS code compressor</div>';
-	//outputs ["", "<div class="tab0">", "CSS code formatter", "</div>", "", "<div class="tab2">", "CSS code compressor", "</div>", ""]	
-	return str.split(htmlTagRegex);
-}
-*/
 
 function remember_story(removelinks) 
 {
@@ -1239,8 +1147,6 @@ function src_changed() // we updated the source code!
 	go(firstscene);
 }
 
-//} // end CYOAwesome constructor
-
 function enableTab(id) {
     var el = document.getElementById(id);
 	if (!el) return;
@@ -1267,7 +1173,7 @@ function enableTab(id) {
 
 function hurryup() // from onclick
 {
-	// hurry = true; // user wants to skip animate_words FIXME: stays true due to race w event and go?
+	
 	if (debugmode) console.log("hurryup");
 }
 
@@ -1400,148 +1306,6 @@ function d6(numberofsixsideddice)
 	return roll;
 }
 
-/*
-Throwing 3 6-faced dice and adding the results yields a number
-range from 3 (1,1,1) to 18 (6,6,6). The gaussian distribution of
-3d6 is much more representative of the bell-shape of the curve:
-
-
-                     *  *
-                     *  *
-                  *  *  *  *
-                  *  *  *  *
-                  *  *  *  *
-                  *  *  *  *
-               *  *  *  *  *  *
-               *  *  *  *  *  *
-               *  *  *  *  *  *
-               *  *  *  *  *  *
-               *  *  *  *  *  *
-               *  *  *  *  *  *
-            *  *  *  *  *  *  *  *
-            *  *  *  *  *  *  *  *
-            *  *  *  *  *  *  *  *
-            *  *  *  *  *  *  *  *
-            *  *  *  *  *  *  *  *
-         *  *  *  *  *  *  *  *  *  *
-         *  *  *  *  *  *  *  *  *  *
-         *  *  *  *  *  *  *  *  *  *
-         *  *  *  *  *  *  *  *  *  *
-      *  *  *  *  *  *  *  *  *  *  *  *
-      *  *  *  *  *  *  *  *  *  *  *  *
-      *  *  *  *  *  *  *  *  *  *  *  *
-   *  *  *  *  *  *  *  *  *  *  *  *  *  *
-   *  *  *  *  *  *  *  *  *  *  *  *  *  *
-*  *  *  *  *  *  *  *  *  *  *  *  *  *  *  *
-----------------------------------------------
-3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
-Number of dice roll combinations: 
-1, 3, 6,10,15,21,25,27,27,25,21,15,10, 6, 3, 1
-
-The average of a dice throw might be important to
-decision-making. For instance, the average of a 3d6 throw is
-10.5. This is displayed on the chart above, being the highest
-point on the curve. The average for any dice throw can also be
-calculated by adding the lowest possible score to the higest
-possible score and dividing by 2. In the 3d6 example, this is
-(3+18)/2=10.5, It can also be reached by taking the average of
-each die's result ((1+6)/2=3.5, for a d6) and multiplying by the
-number of dice thrown ((3.5)*3=10.5).
-*/
-
-var roll_likelihood_string = [
-	/* 00 */ 'completely impossible',
-	/* 01 */ 'almost impossible',
-	/* 02 */ 'improbable',
-	/* 03 */ 'quite unlikely',
-	/* 04 */ 'unlikely',
-	/* 05 */ 'quite rare',
-	/* 06 */ 'rare',
-	/* 07 */ 'uncommon',
-	/* 08 */ 'not uncommon',
-	/* 09 */ 'quite common',
-	/* 10 */ 'everyday',
-	/* 11 */ 'somewhat likely',
-	/* 12 */ 'likely',
-	/* 13 */ 'possibly',
-	/* 14 */ 'probably',
-	/* 15 */ 'quite probably',
-	/* 16 */ 'most likely',
-	/* 17 */ 'very likely',
-	/* 18 */ 'inevitable',
-	/* 19 */ 'unavoidable',
-	/* 20 */ 'going to happen'];
-	
-var roll_ability_string = [
-	/* 00 */ 'completely ignorant',
-	/* 01 */ 'virtually ignorant',
-	/* 02 */ 'complete newbie',
-	/* 03 */ 'newbie',
-	/* 04 */ 'total beginner',
-	/* 05 */ 'beginner',
-	/* 06 */ 'familiar',
-	/* 07 */ 'mediocre',
-	/* 08 */ 'acceptable',
-	/* 09 */ 'practiced',
-	/* 10 */ 'competent',
-	/* 11 */ 'very competent',
-	/* 12 */ 'impressive',
-	/* 13 */ 'very impressive',
-	/* 14 */ 'great',
-	/* 15 */ 'heroic',
-	/* 16 */ 'fantastic',
-	/* 17 */ 'incredible',
-	/* 18 */ 'amazing',
-	/* 19 */ 'legendary',
-	/* 20 */ 'godlike'];
-
-var roll_difficulty_string = [
-	/* 00 */ 'simple',
-	/* 01 */ 'simple',
-	/* 02 */ 'simple',
-	/* 03 */ 'newbie',
-	/* 04 */ 'beginner',
-	/* 05 */ 'beginner',
-	/* 06 */ 'everyday',
-	/* 07 */ 'everyday',
-	/* 08 */ 'practiced',
-	/* 09 */ 'practiced',
-	/* 10 */ 'competent',
-	/* 11 */ 'competent',
-	/* 12 */ 'impressive',
-	/* 13 */ 'impressive',
-	/* 14 */ 'great',
-	/* 15 */ 'heroic',
-	/* 16 */ 'fantastic',
-	/* 17 */ 'incredible',
-	/* 18 */ 'amazing',
-	/* 19 */ 'legendary',
-	/* 20 */ 'godlike'];
-
-function roll_likelihood(roll)
-{
-	roll=parseInt(roll);
-	if (roll < 0) return  'impossibly low';
-	if (roll > 20) return 'impossibly high';
-	return roll_likelihood_string[roll];
-} 
-
-function roll_ability(roll)
-{
-	roll=parseInt(roll);
-	if (roll < 0) return  'impossibly low';
-	if (roll > 20) return 'impossibly high';
-	return roll_ability_string[roll];
-} 
-
-function roll_difficulty(roll)
-{
-	roll=parseInt(roll);
-	if (roll < 0) return  'impossibly low';
-	if (roll > 20) return 'impossibly high';
-	return roll_difficulty_string[roll];
-} 
-
 function plusminus(anumber) // eg "+5" or "-1" or "" for zero
 {
 	if (anumber>0) return '+'+anumber;
@@ -1558,263 +1322,12 @@ function roll3d6(bonus)
 	g.rolltotalunmodified = g.roll1+g.roll2+g.roll3;
 	var total=g.roll1+g.roll2+g.roll3+bonus;
 	var bonus_str = '';
-	bonus_str = plusminus(bonus);
+	onus_str = plusminus(bonus);
 	g.lastrollhtml = 'rolled a '+'('+g.roll1+','+g.roll2+','+g.roll3+')'+bonus_str+'=<b>'+total+'</b>';
 	g.lastrollterse = g.rolltotalunmodified+bonus_str+'=<b>'+total+'</b>';
 	g.lastroll = total;
 	return g.lastroll;
 }
-
-
-
-
-
-
-// How to resolve Combat
-// Compare the totals of the Attacker and the Defender. 
-// Attacker AV = REF + H2H Skill + 3d6
-// vs.
-// Defender DV = DEX + Evade Skill + 3d6
-// If the Attacker has a higher total, the hit succeeds and Damage (1d6 times the weapon's DC) is taken.
-function resolve_combat(attacker_attribute,attacker_skill,attack_bonus,attacker_damage,damage_bonus,defender_attribute,defender_skill,defender_bonus)
-{
-	attacker_attribute = parseInt(attacker_attribute);
-	attacker_skill = parseInt(attacker_skill);
-	attack_bonus = parseInt(attack_bonus);
-	attacker_damage = parseInt(attacker_damage);
-	damage_bonus = parseInt(damage_bonus);
-	defender_attribute = parseInt(defender_attribute);
-	defender_skill = parseInt(defender_skill);
-	defender_bonus = parseInt(defender_bonus);
-
-	g.av = attacker_attribute + attacker_skill + roll3d6(attack_bonus);
-	g.lastcombatattackroll = g.lastrollhtml;
-	
-	// show the player's roll on the gui before it gets overwritten
-	if (g.roll_on_gui)
-	{
-		if (g.die1div) { g.die1div.style.backgroundPosition = '0px -' + ((g.roll1*32)-32) + 'px'; }
-		if (g.die2div) { g.die2div.style.backgroundPosition = '0px -' + ((g.roll2*32)-32) + 'px'; }
-		if (g.die3div) { g.die3div.style.backgroundPosition = '0px -' + ((g.roll3*32)-32) + 'px'; }
-		if (g.rollnumberdiv) g.rollnumberdiv.innerHTML = g.lastrollterse;
-	}
-
-	g.dv = defender_attribute + defender_skill + roll3d6(defender_bonus);
-	g.lastcombatdefenceroll = g.lastrollhtml;
-
-	if (g.av > g.dv) // hit!
-	{
-		g.lastcombatdamage = d6(attacker_damage) + damage_bonus;
-		g.lastcombatresulthtml = 'hit for ' + g.lastcombatdamage + ' damage';
-		return g.lastcombatdamage;
-	}
-	// miss:
-	g.lastcombatresulthtml = 'missed';
-	g.lastcombatdamage = 0;
-	return g.lastcombatdamage;
-}
-
-// How to resolve Skill Rolls:
-// Action Value (AV) = ATTRIBUTE + SKILL + 3d6
-// Attribute/Skill Levels: (0-1:challenged, 1-2:everyday, 3-4:competent, 5-6:impressive, 7-8:incredible, 9-10:legendary)
-// 0-1: challenged ability - don't know how to perform this task. 1-2: everyday ability - learned the basics, a beginner. 3-4: competent ability - well trained and practiced, a professional. 5-6: impressive ability - a master craftsman of the skill. 7-8: incredible ability - one of the best at this skill, an Olympian. 9-?: legendary ability - a genius, a prodigy at this skill.
-// vs.
-// Skill Difficulty Value (DV)
-// Skill Difficulty Values: (Simple=10, Easy=12, Everyday=14, Practiced=16, Competent=18, Impressive=20, Heroic=22, Incredible=26, Legendary=30)
-// If you roll higher, you succeed
-function resolve_skill(attribute,skill,bonus,difficulty)
-{
-	attribute = parseInt(attribute);
-	skill = parseInt(skill);
-	bonus = parseInt(bonus);
-	difficulty = parseInt(difficulty);
-	
-	g.av = attribute + skill + bonus + roll3d6();
-	g.dv = difficulty;
-	if (g.av > g.dv) // success!
-	{
-		g.lastskillsuccess = true;
-		g.lastskillresulthtml = 'succeded';
-		return g.lastskillsuccess;
-	}
-	// fail:
-	g.lastskillsuccess = false;
-	g.lastskillresulthtml = 'failed';
-	return g.lastskillsuccess;
-}
-
-function swingmetertimer()
-{
-	var rand6 = 24; // pixels
-
-	if (!swinging) return;
-	swingframecount++;
-	
-	// jumble the dice around occasionally
-	if (swingframecount % 12 == 0)
-	{
-		if (g.die1div) { rand6 = d6(); g.die1div.style.backgroundPosition = '0px -' + ((rand6*32)-32) + 'px'; }
-		if (g.die2div) { rand6 = d6(); g.die2div.style.backgroundPosition = '0px -' + ((rand6*32)-32) + 'px'; }
-		if (g.die3div) { rand6 = d6(); g.die3div.style.backgroundPosition = '0px -' + ((rand6*32)-32) + 'px'; }
-	}
-	
-	if (swingframecount>100) 
-	{
-		swingframecount = 100;
-		swing_stop();
-	}
-	else
-	{
-		if (swingpowerdiv) swingpowerdiv.style.width = (swingframecount) + '%'; // fixme resize poop
-		setTimeout(swingmetertimer,16); // most browsers except chrome force 15ms or 16ms minimum
-	}
-}
-function swing_start()
-{
-	if (battlediv) battlediv.innerHTML += 'You swing your sword...';
-	swinging = true;
-	if (!swingpowerdiv) swingpowerdiv = document.getElementById('swingpower');
-	if (!swingtextdiv) swingtextdiv = document.getElementById('swingtext');
-	if (!g.die1div) g.die1div = document.getElementById('die1');
-	if (!g.die2div) g.die2div = document.getElementById('die2');
-	if (!g.die3div) g.die3div = document.getElementById('die3');
-	if (!g.rollnumberdiv) g.rollnumberdiv = document.getElementById('rollnumber');
-	if (g.rollnumberdiv) g.rollnumberdiv.innerHTML = '';
-	if (swingtextdiv) swingtextdiv.innerHTML = "SWINGING...";
-	swingframecount = 0;
-	swingmetertimer();
-}
-var swing_sweet_spot = 75;
-function swing_stop()
-{
-	swinging = false;
-	if (!Math.abs) alert('Missing Math.abs function...');
-	var swingpower = 100 - (Math.abs(swing_sweet_spot-swingframecount)); 
-	if (swingpower < 0) swingpower = 0;
-	if (swingpower > 100) swingpower = 100;
-	var swingbonus = 0;
-	var swingquality = 'average';
-	if (swingpower < 76) { swingbonus = -1; swingquality = ((swingframecount > swing_sweet_spot) ? 'too late!' : 'too early!'); }
-	if (swingpower > 94) { swingbonus = 1; swingquality = 'good'; }
-	if (swingpower > 96) { swingbonus = 2; swingquality = 'great'; }
-	if (swingpower > 98) { swingbonus = 3; swingquality = 'excellent'; }
-	if (swingpower > 99) { swingbonus = 4; swingquality = 'perfect!'; }
-
-	if (battlediv) battlediv.innerHTML += ' with ' + plusminus(swingbonus) + ' power.<br>';
-	//if (swingtextdiv) swingtextdiv.innerHTML = "SWING POWER: " + swingpower + '% ('+plusminus(swingbonus)+') '+swingquality;//swingframecount;
-	if (swingtextdiv) swingtextdiv.innerHTML = 'SWING POWER: ('+plusminus(swingbonus)+') '+swingquality;
-	// cls
-	if (battlediv) battlediv.innerHTML = '';
-	var damagedice = 1; //d6
-	var damagebonus = 0;
-	var defencebonus = 0;
-	g.roll_on_gui = true;
-	var dam = resolve_combat(player[1].str,player[1].h2h,swingbonus,damagedice,damagebonus,enemy[1].dex,enemy[1].h2h,defencebonus); //(attacker_attribute,attacker_skill,attack_bonus,attacker_damage,damage_bonus,defender_attribute,defender_skill,defender_bonus)
-	if (battlediv) battlediv.innerHTML += player[1].name + ' ' +g.lastcombatattackroll + '.  ';
-	if (battlediv) battlediv.innerHTML += enemy[1].name + ' ' +g.lastcombatdefenceroll + '.  ';
-	if (battlediv) battlediv.innerHTML += player[1].name + ' ' + g.lastcombatresulthtml + '.<br>';
-	enemy[1].hp -= dam;
-	if (enemy[1].hp < 1) 
-	{
-		if (battlediv) battlediv.innerHTML += '<br><b>'+enemy[1].name + ' was defeated.</b><br>';
-		battle_end();
-		return;
-	}
-	damagedice = 1; //d6
-	damagebonus = 0;
-	defencebonus = 0;
-	swingbonus = 0; // enemies get no bonus
-	g.roll_on_gui = false;
-	dam = resolve_combat(enemy[1].str,enemy[1].h2h,swingbonus,damagedice,damagebonus,player[1].dex,player[1].h2h,defencebonus); //(attacker_attribute,attacker_skill,attack_bonus,attacker_damage,damage_bonus,defender_attribute,defender_skill,defender_bonus)
-	if (battlediv) battlediv.innerHTML += enemy[1].name + ' ' +g.lastcombatattackroll + '.  ';
-	if (battlediv) battlediv.innerHTML += player[1].name + ' ' +g.lastcombatdefenceroll + '.  ';
-	if (battlediv) battlediv.innerHTML += enemy[1].name + ' ' + g.lastcombatresulthtml + '.<br>';
-	player[1].hp -= dam;
-	if (player[1].hp < 1) 
-	{
-		if (battlediv) battlediv.innerHTML += '<br><b>'+player[1].name + ' was defeated.</b><br>';
-		battle_end();
-		return;
-	}
-	// show current hp
-	if (battlediv) battlediv.innerHTML += player[1].name + ' hp=' + player[1].hp + ' ' + enemy[1].name + ' hp=' + enemy[1].hp + '<br><br>';
-}
-function swingclick()
-{
-	if (!in_battle) battle_start();
-	if (swinging) 
-		swing_stop();
-	else
-		swing_start();
-}
-// 3d6 battle simulator test bed
-var battlediv = null; 
-var player = []; player[1] = { name:'Tynter', str:12, dex:12, h2h:12, hp:12 };
-var enemy = []; enemy[1] = { name:'Orc', str:12, dex:12, h2h:12, hp:6 };
-function battle_start()
-{
-	//document.onmousedown = swingclick;
-	if (!battlediv) battlediv = document.getElementById('battle');
-	if (!battlediv) return;
-	if (!swingdiv) swingdiv = document.getElementById('swingmeter');
-	if (!swingdiv) return;
-	if (!player || !player[1] || !player[1].name) return;
-	if (!enemy || !enemy[1] || !enemy[1].name) return;
-	//alert('BATTLE START');
-	in_battle = true;
-	// for debug purposes, re-roll!
-	player[1].str = roll3d6();
-	player[1].dex = roll3d6();
-	player[1].h2h = roll3d6();
-	player[1].hp = roll3d6(+6);
-	enemy[1].str = roll3d6();
-	enemy[1].dex = roll3d6();
-	enemy[1].h2h = roll3d6();
-	enemy[1].hp = roll3d6();
-	battlediv.innerHTML = '<b>Battle begins: ' + player[1].name + ' vs ' + enemy[1].name + '</b><br><br>';
-	battlediv.innerHTML += player[1].name + ' STR:'+player[1].str + ' DEX:'+player[1].dex + ' HP:'+player[1].hp + '<br>';
-	battlediv.innerHTML += enemy[1].name + ' STR:'+enemy[1].str + ' DEX:'+enemy[1].dex + ' HP:'+enemy[1].hp + '<br><br>';
-	battlediv.style.display='block';
-	swingdiv.style.display='block';
-}
-function battle_end()
-{
-	//alert('BATTLE END');
-	// document.onmousedown = null;
-	in_battle = false;
-	if (battlediv) battlediv.style.display='none';
-	if (swingdiv) swingdiv.style.display='none';
-}
-
-var swingmeter_div = null;
-function swing_meter_init()
-{
-	// init - FIXME
-	swingmeter_div = document.getElementById('swingmeter');
-	swingmeter_div.onmousedown = swingclick;
-}
-//////////////////////////////////////////////////////////////// BATTLE ENDS
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 // run after ajax finishes downloading story.txt
